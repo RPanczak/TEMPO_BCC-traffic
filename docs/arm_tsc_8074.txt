@@ -1,0 +1,51 @@
+# location
+# -27.49385, 153.0066
+# cross of Fred Schonell Dr & Coldridge St
+# https://goo.gl/maps/4KPbniEgjb32
+# lanes
+
+# lanes on tsc
+SA-503
+SA-504
+SA-505
+SA-506
+SA-507
+
+
+list(arm = 1:3, 
+	azimuth = c(270, 90, 180), 
+	streetName = c("SIR FRED SCHONELL DR", "SIR FRED SCHONELL DR", "COLDRIDGE ST"), 
+	slipLaneCount = c(0, 0, 0), 
+	leftLaneCount = c(2, 2, 3), 
+	rightLaneCount = c(2, 2, 1), 
+	nextTsc = c(286, NA, NA), 
+	detectors = list(
+		list(controller = c(8074, 8074, 8074), 
+		detNo = c(1, 2, 8), 
+		lane = c(1, 2, 1), 
+		position = c(1, 0, 0), 
+		leftArrow = c(FALSE, FALSE, FALSE), 
+		straightArrow = c(FALSE, FALSE, FALSE), 
+		rightArrow = c(FALSE, FALSE, FALSE), 
+		slipLane = c(FALSE, FALSE, FALSE)
+		), 
+		list(controller = c(8074, 8074), 
+		detNo = 3:4, 
+		lane = 1:2, 
+		position = c(0, 0), 
+		leftArrow = c(FALSE, FALSE), 
+		straightArrow = c(FALSE, FALSE), 
+		rightArrow = c(FALSE, FALSE), 
+		slipLane = c(FALSE, FALSE)
+		), 
+		list(controller = c(8074, 8074, 8074), 
+		detNo = 5:7, 
+		lane = 1:3, 
+		position = c(0, 0, 0), 
+		leftArrow = c(FALSE, FALSE, TRUE), 
+		straightArrow = c(FALSE, FALSE, FALSE), 
+		rightArrow = c(TRUE, TRUE, FALSE), 
+		slipLane = c(FALSE, FALSE, FALSE)
+		)
+	)
+)

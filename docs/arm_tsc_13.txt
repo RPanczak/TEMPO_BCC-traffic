@@ -1,0 +1,38 @@
+# location
+# -27.471540, 153.022689
+# cross of N Quay & Queen St
+# https://goo.gl/maps/PovAaCFH3wK2
+
+list(arm = 1:9, 
+	azimuth = c(315, 50, 315, 50, 135, 135, 140, 240, 240), 
+	streetName = c("NORTH QUAY", NA, NA, "QUEEN ST", "WILLIAM ST", NA, "QUEENS WHARF RD", NA, "VICTORIA BRIDGE"), 
+	slipLaneCount = c(0, 0, 0, 0, 0, 0, 0, 1, 0), leftLaneCount = c(1, 4, 3, 2, 2, 1, 1, 2, 2), rightLaneCount = c(0, 2, 0, 1, 3, 1, 1, 2, 2), 
+	nextTsc = c(245, NA, NA, 8045, 1508, NA, NA, NA, 400), 
+	detectors = list(
+		list(controller = 13, detNo = 4, lane = 1, position = 0, leftArrow = FALSE, straightArrow = FALSE, rightArrow = TRUE, slipLane = FALSE), 
+		list(), 
+		list(controller = c(13, 13, 13, 13, 13), 
+			detNo = c(1, 2, 3, 13, 14), 
+			lane = c(3, 2, 1, 3, 2), 
+			position = c(0, 0, 0, 1, 1), 
+			leftArrow = c(TRUE, FALSE, FALSE, TRUE, FALSE), 
+			straightArrow = c(TRUE, TRUE, FALSE, TRUE, TRUE), 
+			rightArrow = c(FALSE, FALSE, TRUE, FALSE, FALSE), 
+			slipLane = c(FALSE, FALSE, FALSE, FALSE, FALSE)), 
+		list(controller = c(13, 13, 13, 13), detNo = c(11, 12, 15, 16), lane = c(2, 1, 2, 1), position = c(0, 0, 1, 1), leftArrow = c(TRUE, FALSE, TRUE, FALSE ), straightArrow = c(FALSE, TRUE, FALSE, TRUE), rightArrow = c(FALSE, FALSE, FALSE, FALSE), slipLane = c(FALSE, FALSE, FALSE, FALSE)), 
+		list(controller = c(13, 13, 13, 13), detNo = c(9, 10, 19, 20), lane = c(2, 1, 2, 1), position = c(0, 0, 1, 1), leftArrow = c(TRUE, TRUE, TRUE, TRUE), straightArrow = c(FALSE, FALSE, FALSE, FALSE), rightArrow = c(FALSE, TRUE, FALSE, TRUE), slipLane = c(FALSE, FALSE, FALSE, FALSE)), 
+		list(), 
+		list(controller = 13, detNo = 8, lane = 1, position = 0, leftArrow = FALSE, straightArrow = FALSE, rightArrow = FALSE, slipLane = FALSE), 
+		list(controller = c(13, 13, 13, 13, 13), detNo = c(5, 6, 7, 17, 18), lane = c(1, 2, -1, 1, 2), position = c(0, 0, 0, 31, 1), leftArrow = c(FALSE, FALSE, FALSE, FALSE, FALSE), straightArrow = c(FALSE, FALSE, FALSE, FALSE, FALSE), rightArrow = c(FALSE, FALSE, FALSE, FALSE, FALSE), slipLane = c(TRUE, FALSE, FALSE, FALSE, FALSE)), 
+		list()))
+
+lanes on tsc
+SA-224
+SA-225
+SA-227
+SA-228
+SA-229
+SA-230
+SA-231
+SA-232
+SA-240
