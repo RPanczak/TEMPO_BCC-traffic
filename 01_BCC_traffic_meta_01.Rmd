@@ -20,7 +20,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE, fig.width=8, fig.height=6, dpi=300, out.width="800px", out.height="600px")
 
-# knitr::opts_knit$set(root.dir = 'R:/POP247-Q0786/')
+# knitr::opts_knit$set(root.dir = 'R:\BCCTRAFFIC-Q1071\TEMPO_BCC-traffic')
 # setwd('R:/POP247-Q0786/')
 
 set.seed(12345)
@@ -153,10 +153,7 @@ qtm(coordinates_sf)
 intersect %>% 
   filter(is.na(coordinates.latLng.longitude) & is.na(coordinates.latLng.latitude)) %>% 
   select(tsc, region, suburb) 
-
 ```
-
-**TODO: find missing coordinates using `arms$streetName`**
 
 
 
