@@ -1,0 +1,89 @@
+---
+title: "BCC traffic data - aggregated `mf` patterns"
+author: "Radoslaw Panczak"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+mainfont: DejaVu Sans
+output: 
+  html_document: 
+    # css: custom.css
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    number_sections: true
+    theme: united 
+    highlight: pygments 
+---
+
+<!-- ------------------------------------------------------------ --> 
+<!-- ------------------------------------------------------------ --> 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE, fig.width=8, fig.height=6, dpi=300, out.width="800px", out.height="600px")
+
+# knitr::opts_knit$set(root.dir = 'R:/POP247-Q0786/')
+# setwd('R:/POP247-Q0786/')
+
+set.seed(12345)
+
+options(scipen=999)
+
+library(pacman) 
+p_load(tidyverse, fs, here, readxl, magrittr, anytime, jsonlite,
+       naniar, janitor, kableExtra, summarytools, 
+       sf, tmap, tmaptools)
+
+tmap_mode("view") # makes map interactive
+
+isUnique <- function(vector){
+  return(!any(duplicated(vector)))
+}
+
+```
+
+```{r}
+BCC_raw <- readRDS(here("data", "BCC", "traffic", "clean", "BCC_raw.Rds"))
+```
+
+```{r}
+traffic_8074 <- BCC_raw %>% 
+  filter(tsc == 8074) 
+``` 
+
+```{r, echo=FALSE}
+ggplot(traffic_8074, aes(x = recorded, y = mf)) + 
+  geom_line() + scale_x_datetime() + theme_minimal() + 
+  xlab("") + ylab("Measured flow (all lanes)")
+```
+
+
+```{r}
+mf_8074 %>% 
+  # slice(1:10) %>% 
+  select(recorded) %>% 
+  mutate(date = as.Date(recorded)) %>% 
+  ggplot() +
+  geom_histogram(aes(date), binwidth = 1) +
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week") + 
+  theme_minimal()
+```
+
+```{r eval=FALSE, include=FALSE}
+temp <- mf_8074 %>% 
+  # slice(1:10) %>%
+  select(recorded) %>% 
+  mutate(date = as.Date(recorded)) %>% 
+  group_by(date) %>% 
+  summarise(freq = n()) %>% 
+  arrange(date) %>% 
+  ungroup()
+
+```
+
+```{r}
+traffic_8074 <- read_csv(here("data", "BCC", "traffic", "raw", "back_02.csv")) %>% 
+  filter(tsc == 8074) 
+
+freq(traffic_8074$lane)
+
+```
+

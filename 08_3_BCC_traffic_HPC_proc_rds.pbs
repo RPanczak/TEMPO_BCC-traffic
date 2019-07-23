@@ -1,0 +1,16 @@
+#PBS -A UQ-SCI-Earth
+#PBS -l select=1:ncpus=1:mem=32GB
+#PBS -l walltime=02:00:00
+
+# data
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2019_04_agg.csv $TMPDIR
+
+# script
+cat /RDS/Q0786/08_4_BCC_traffic_HPC_proc_rds.R | tr -d '\r' > $TMPDIR/08_4_BCC_traffic_HPC_proc_rds.R
+
+cd $TMPDIR
+
+module purge
+module load R
+
+R CMD BATCH --verbose --no-save --no-restore 08_4_BCC_traffic_HPC_proc_rds.R

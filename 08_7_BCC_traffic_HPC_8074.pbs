@@ -1,0 +1,60 @@
+#PBS -A UQ-SCI-Earth
+#PBS -l select=1:ncpus=1:mem=32GB
+#PBS -l walltime=02:00:00
+
+# data
+cp /RDS/Q0786/data/BCC/traffic/raw/back_01.csv $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/raw/back_02.csv $TMPDIR
+
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2018_09.csv.tar.gz $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2018_10.csv.tar.gz $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2018_11.csv.tar.gz $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2018_12.csv.tar.gz $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2019_01.csv.tar.gz $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2019_02.csv.tar.gz $TMPDIR
+
+cd $TMPDIR
+
+tar -xzvf bcc_2018_09.csv.tar.gz
+tar -xzvf bcc_2018_10.csv.tar.gz
+tar -xzvf bcc_2018_11.csv.tar.gz
+tar -xzvf bcc_2018_12.csv.tar.gz
+tar -xzvf bcc_2019_02.csv.tar.gz
+tar -xzvf bcc_2019_01.csv.tar.gz
+
+rm *.tar.gz
+
+# select tsc 8074
+awk -F , '$7 == "8074" { print }' back_01.csv > back_01_8074.csv
+awk -F , '$7 == "8074" { print }' back_02.csv > back_02_8074.csv
+awk -F , '$7 == "8074" { print }' bcc_2018_09.csv > bcc_2018_09_8074.csv
+awk -F , '$7 == "8074" { print }' bcc_2018_10.csv > bcc_2018_10_8074.csv
+awk -F , '$7 == "8074" { print }' bcc_2018_11.csv > bcc_2018_11_8074.csv
+awk -F , '$7 == "8074" { print }' bcc_2018_12.csv > bcc_2018_12_8074.csv
+awk -F , '$7 == "8074" { print }' bcc_2019_01.csv > bcc_2019_01_8074.csv
+awk -F , '$7 == "8074" { print }' bcc_2019_02.csv > bcc_2019_02_8074.csv
+
+# first line of file
+head -1 back_01.csv > traffic_8074.csv
+
+rm back_01.csv
+rm back_02.csv
+rm bcc_2018_09.csv
+rm bcc_2018_10.csv
+rm bcc_2018_11.csv
+rm bcc_2018_12.csv
+rm bcc_2019_02.csv
+rm bcc_2019_01.csv
+
+# loop and append
+for filename in $(ls b*.csv); do sed 1d $filename >> traffic_8074.csv; done
+
+cp traffic_8074.csv /RDS/Q0786/data/BCC/traffic/clean
+
+# inside R
+cat /RDS/Q0786/08_8_BCC_traffic_HPC_8074.R | tr -d '\r' > $TMPDIR/08_8_BCC_traffic_HPC_8074.R
+
+module purge
+module load R
+
+R CMD BATCH --verbose --no-save --no-restore 08_8_BCC_traffic_HPC_8074.R

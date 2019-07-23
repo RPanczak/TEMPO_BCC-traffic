@@ -1,0 +1,25 @@
+#PBS -A UQ-SCI-Earth
+#PBS -l select=1:ncpus=1:mem=96GB
+#PBS -l walltime=01:00:00
+
+# data
+cp /RDS/Q0786/data/BCC/traffic/clean/back_01_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/back_02_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2018_09_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2018_10_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2018_11_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2018_12_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2019_01_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2019_02_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2019_03_agg.Rds $TMPDIR
+cp /RDS/Q0786/data/BCC/traffic/clean/bcc_2019_04_agg.Rds $TMPDIR
+
+# script
+cat /RDS/Q0786/08_6_BCC_traffic_HPC_rbind.R | tr -d '\r' > $TMPDIR/08_6_BCC_traffic_HPC_rbind.R
+
+cd $TMPDIR
+
+module purge
+module load R
+
+R CMD BATCH --verbose --no-save --no-restore 08_6_BCC_traffic_HPC_rbind.R

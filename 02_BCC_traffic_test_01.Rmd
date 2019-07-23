@@ -1,0 +1,286 @@
+---
+title: "BCC traffic data - exploratory data analysis 01"
+author: "Radoslaw Panczak"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  html_document: 
+    # css: custom.css
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    number_sections: true
+    theme: united 
+    highlight: pygments 
+---
+
+<!-- ------------------------------------------------------------ --> 
+<!-- ------------------------------------------------------------ --> 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE, fig.width=8, fig.height=6, dpi=300, out.width="800px", out.height="600px")
+
+# knitr::opts_knit$set(root.dir = 'R:/POP247-Q0786/')
+# setwd('R:/POP247-Q0786/')
+
+set.seed(12345)
+
+library(pacman) 
+
+p_load(tidyverse, here, readxl, magrittr, anytime, jsonlite, fs, 
+       skimr, statar, naniar, janitor, kableExtra, 
+       sf, tmap, tmaptools)
+
+tmap_mode("view") # makes map interactive
+
+isUnique <- function(vector){
+  return(!any(duplicated(vector)))
+}
+```
+
+
+```{r, echo=FALSE, include=FALSE}
+intersect <- jsonlite::fromJSON(here("data", "BCC", "traffic", "raw", "locations",
+                                     "Intersection_locations_reference.json"), 
+                                flatten = TRUE)
+```
+
+
+```{r, eval=FALSE, include=FALSE}
+
+names(intersect)
+dim(intersect)
+
+tab(intersect, scatsVersion)
+intersect$scatsVersion <- NULL
+
+tab(intersect, suburb)
+
+isUnique(intersect$subsystem)  #missings!
+isUnique(intersect$tsc)
+isUnique(intersect$areaNum)
+
+intersect %>%
+  select(tsc, coordinates.latLng.latitude, coordinates.latLng.longitude) %>%
+  filter(!is.na(coordinates.latLng.longitude) & !is.na(coordinates.latLng.latitude)) %>%
+  st_as_sf(., coords = c("coordinates.latLng.longitude", "coordinates.latLng.latitude"),
+           crs = 4326, agr = "constant") -> coordinates_sf
+
+qtm(coordinates_sf)
+
+intersect %>% 
+  filter(tsc == 8074) %>% 
+  View()
+
+```
+
+# Intersection volume 
+
+## Example
+
+```{r}
+example <- jsonlite::fromJSON(here("data", "BCC", "traffic", "raw", "temp_02",
+                                   "traffic-data-at-int-201809060626.json"), 
+                              flatten = TRUE)
+
+```
+
+### Structure
+
+```{r, results='asis'}
+skim(example) %>% 
+  skimr::kable()
+```
+
+### Missing data
+
+```{r}
+gg_miss_var(example, show_pct = TRUE)
+```
+
+
+## Larger example 
+
+```{r, include=FALSE, eval=FALSE}
+# both solutions need files to be correct jsons! 
+
+# old school - results go to separate files!
+names <- list.files(path = here("data", "BCC", "traffic", "raw", "temp_02"), 
+                    pattern  =".json") #, full.names = TRUE)
+
+for (i in 1:length(names)) assign(names[i], jsonlite::fromJSON(names[i], flatten=TRUE))
+
+# new school
+files <- fs::dir_ls(here("data", "BCC", "traffic", "raw", "temp_02"), regexp = "\\.json$")
+
+example <- map_df(files, jsonlite::fromJSON, flatten = TRUE, .id = "source")
+
+basename(files[1]) # use to clean file names?
+
+# length(files)
+# sum_up(file.info(files), size)
+
+```
+
+```{r, echo=FALSE}
+```
+
+```{r, include=FALSE, eval=FALSE}
+example <- here("data", "BCC", "traffic", "raw", "temp_02") %>% 
+  fs::dir_ls(regexp = "\\.json$") %>% 
+  map_df(jsonlite::fromJSON, flatten = TRUE, .id = "source")
+
+saveRDS(example,  here("data", "BCC", "traffic", "clean", "example.Rds"))
+```
+
+```{r}
+example <- readRDS(here("data", "BCC", "traffic", "clean", "example.Rds"))
+```
+
+### Time
+
+```{r}
+example %<>% 
+  select(-source) %>% 
+  mutate(recorded = anytime(recorded))
+
+summary(example$recorded)
+```
+
+**TODO: identify the gaps**
+
+**TODO: find largest period without data**
+
+**TODO: fill in the gaps**
+
+
+### Duplicated rows
+
+There are `r nrow(get_dupes(example))` duplicated rows in the raw data - all occurences were removed
+```{r}
+# isUnique(example$dbid)
+
+example %<>% 
+  distinct()
+```
+
+
+### Temporal pattern
+
+#### One intersection
+
+Example from one intersection in St Lucia (`tsc` == 8074). 
+
+Measured flow (`mf`) aggregated for all lanes.
+
+```{r}
+traffic_8074 <- example %>% 
+  filter(tsc == 8074) %>% 
+  mutate(ds = rowSums(select(., contains("ds")), na.rm = TRUE)) %>% 
+  mutate(mf = rowSums(select(., contains("mf")), na.rm = TRUE)) %>% 
+  mutate(rf = rowSums(select(., contains("rf")), na.rm = TRUE)) %>% 
+  group_by(recorded, tsc) %>% 
+  summarise(ds = sum(ds),
+            mf = sum(mf),
+            rf = sum(rf))
+``` 
+
+```{r, echo=FALSE}
+ggplot(traffic_8074, aes(x = recorded, y = mf)) + 
+  geom_line() + scale_x_datetime() + theme_minimal() + 
+  xlab("") + ylab("Measured flow (all lanes)")
+```
+
+#### All intersections
+
+All (ie. having lat long) across 2 days:
+
+```{r, message=FALSE}
+traffic_agg <- example %>% 
+  mutate(ds = rowSums(select(., contains("ds")), na.rm = TRUE)) %>% 
+  mutate(mf = rowSums(select(., contains("mf")), na.rm = TRUE)) %>% 
+  mutate(rf = rowSums(select(., contains("rf")), na.rm = TRUE)) %>% 
+  group_by(recorded, tsc) %>% 
+  summarise(ds = sum(ds),
+            mf = sum(mf),
+            rf = sum(rf)) %>% 
+  ungroup()
+
+traffic_agg <- left_join(traffic_agg, 
+                         select(intersect, tsc, coordinates.latLng.latitude, coordinates.latLng.longitude)) %>% 
+  filter(!is.na(coordinates.latLng.longitude) & !is.na(coordinates.latLng.latitude))
+```
+
+```{r, echo=FALSE}
+ggplot(traffic_agg, aes(x = recorded, y = mf)) + 
+  geom_line(aes(group = tsc), alpha = 0.01) + 
+  geom_smooth() +
+  scale_x_datetime() + theme_minimal() + xlab("") + ylab("Measured flow (all lanes)")
+```
+
+#### Hourly aggregates
+
+```{r, echo=FALSE}
+traffic_agg %>% 
+  mutate(hod = strftime(recorded, format="%H")) %>% 
+  ggplot(., aes(x = hod, y = mf)) + 
+  geom_boxplot() + theme_minimal() + xlab("Hour of the day") + ylab("Measured flow (all lanes)")
+```
+
+#### Daily aggregates
+
+```{r, echo=FALSE}
+traffic_agg %>% 
+  mutate(dow = strftime(recorded, format="%a")) %>% 
+  ggplot(., aes(x = dow, y = mf)) + 
+  geom_boxplot() + theme_minimal() + xlab("Day of the week") + ylab("Measured flow (all lanes)")
+```
+
+### Spatial pattern
+
+#### One time period
+
+Traffic aggregates across city at 8 AM:
+
+```{r}
+traffic_agg %>% 
+  filter(recorded == "2018-09-06 08:00:00") %>% 
+  ggplot() + 
+  geom_point(aes(x=coordinates.latLng.longitude, y=coordinates.latLng.latitude, size=mf), 
+             colour = "darkgreen", alpha = 0.5, shape=20, stroke=FALSE) +
+  scale_size_continuous(name="Measured flow", range=c(1, 12)) +
+  theme_void() + coord_map() 
+```
+
+#### Full time period
+
+Traffic aggregates across city for one day:
+
+```{r, eval=FALSE}
+library(gganimate)
+
+traffic_agg %>% 
+  ggplot() + 
+  geom_point(aes(x=coordinates.latLng.longitude, y=coordinates.latLng.latitude, size=mf), 
+             colour = "darkgreen", alpha = 0.5, shape=20, stroke=FALSE) +
+  scale_size_continuous(name="Measured flow", range=c(1, 12)) +
+  theme_void() + coord_map() +
+  labs(title = 'Time: {frame_time}') +
+  transition_time(recorded)
+```
+
+# Session info
+
+```{r}
+sessionInfo()
+```
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,163 @@
+---
+title: "BCC traffic data - metadata & locations 01"
+author: "Radoslaw Panczak"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+mainfont: DejaVu Sans
+output: 
+  html_document: 
+    # css: custom.css
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    number_sections: true
+    theme: united 
+    highlight: pygments 
+---
+
+<!-- ------------------------------------------------------------ --> 
+<!-- ------------------------------------------------------------ --> 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE, fig.width=8, fig.height=6, dpi=300, out.width="800px", out.height="600px")
+
+# knitr::opts_knit$set(root.dir = 'R:/POP247-Q0786/')
+# setwd('R:/POP247-Q0786/')
+
+set.seed(12345)
+
+library(pacman) 
+p_load(tidyverse, here, readxl, magrittr, anytime, jsonlite,
+       skimr, naniar, janitor, kableExtra, 
+       sf, tmap, tmaptools)
+
+tmap_mode("view") # makes map interactive
+
+skim_with(numeric = list(hist = NULL))
+          
+isUnique <- function(vector){
+  return(!any(duplicated(vector)))
+}
+
+```
+
+
+# General description
+
+Traffic intersection data from  [BCC](https://www.data.brisbane.qld.gov.au/data/dataset/traffic-data-at-intersection-api).
+
+
+# Metadata 
+
+```{r, results='hide'}
+intersect_meta <- jsonlite::fromJSON(here("data", "BCC", "traffic", "raw", "locations",
+                                          "Intersection_locations_reference_metadata.json"), 
+                                     flatten = FALSE)
+
+intersect_meta <- as.data.frame(unlist(intersect_meta))
+intersect_meta <- rownames_to_column(intersect_meta, var = "rowname")
+
+intersect_meta %<>% 
+  filter(rowname != "swagger") %>% 
+  mutate(rowname = str_replace(rowname, fixed("definitions."), "")) %>% 
+  separate(rowname, into = c("v1", "v2", "v3", "v4", "v5"), 
+           sep = "\\.", remove = FALSE, extra = "merge", fill = "right")
+
+# library(xlsx)
+# write.xlsx(intersect_meta, here("data", "BCC", "traffic", "clean",
+#                         "intersect_meta.xlsx"))
+```
+
+```{r, results='asis'}
+intersect_meta %>% 
+  dplyr::filter(grepl("description", rowname)) %>% 
+  select(rowname, `unlist(intersect_meta)`) %>% 
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F)
+```
+
+
+# Locations 
+
+```{r, results='hide'}
+intersect <- jsonlite::fromJSON(here("data", "BCC", "traffic", "raw", "locations",
+                                     "Intersection_locations_reference.json"), 
+                                flatten = TRUE)
+```
+
+```{r, echo=FALSE, include=FALSE}
+names(intersect)
+dim(intersect)
+
+tab(intersect, scatsVersion)
+intersect$scatsVersion <- NULL
+
+tab(intersect, suburb)
+
+isUnique(intersect$subsystem)  #missings!
+isUnique(intersect$tsc)
+isUnique(intersect$areaNum)
+```
+
+## Structure
+
+```{r, results='asis'}
+select(intersect, -arms) %>%
+  skim() %>%
+  skimr::kable()
+```
+
+
+## Missing data
+
+```{r}
+gg_miss_var(intersect, show_pct = TRUE)
+```
+
+## Arms?
+
+```{r}
+intersect$arms[1]
+```
+
+What is `arms` exactly?
+
+Resolve nested data.
+
+Use azimuth to get direction in / out of city?
+
+## Coordinates
+
+### Coords available
+
+Excluding missing!
+
+```{r, include=FALSE}
+intersect %>% 
+  select(tsc, coordinates.latLng.latitude, coordinates.latLng.longitude) %>% 
+  filter(!is.na(coordinates.latLng.longitude) & !is.na(coordinates.latLng.latitude)) %>% 
+  st_as_sf(., coords = c("coordinates.latLng.longitude", "coordinates.latLng.latitude"), 
+           crs = 4326, agr = "constant") -> coordinates_sf
+
+st_write(coordinates_sf, 
+         "\\\\gpem-atlas2/QCPR/Projects/ABS Linkage/Data/geo/ABS/clean/BCC_traffic_locations.shp", 
+         delete_layer = TRUE)
+```
+
+```{r}
+qtm(coordinates_sf)
+```
+
+### Missing coords
+
+```{r}
+intersect %>% 
+  filter(is.na(coordinates.latLng.longitude) & is.na(coordinates.latLng.latitude)) %>% 
+  select(tsc, region, suburb) 
+
+```
+
+**TODO: find missing coordinates using `arms$streetName`**
+
+
+
+
