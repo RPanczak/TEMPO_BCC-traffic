@@ -49,7 +49,7 @@ Traffic intersection data from  [BCC](https://www.data.brisbane.qld.gov.au/data/
 # Metadata 
 
 ```{r, results='hide'}
-intersect_meta <- jsonlite::fromJSON(here("data", "BCC", "traffic", "raw", "locations",
+intersect_meta <- jsonlite::fromJSON(here("data", "raw", "locations",
                                           "Intersection_locations_reference_metadata.json"), 
                                      flatten = FALSE)
 
@@ -63,7 +63,7 @@ intersect_meta %<>%
            sep = "\\.", remove = FALSE, extra = "merge", fill = "right")
 
 # library(xlsx)
-# write.xlsx(intersect_meta, here("data", "BCC", "traffic", "clean",
+# write.xlsx(intersect_meta, here("data", "clean",
 #                         "intersect_meta.xlsx"))
 ```
 
@@ -79,7 +79,7 @@ intersect_meta %>%
 # Locations 
 
 ```{r, results='hide'}
-intersect <- jsonlite::fromJSON(here("data", "BCC", "traffic", "raw", "locations",
+intersect <- jsonlite::fromJSON(here("data", "raw", "locations",
                                      "Intersection_locations_reference.json"), 
                                 flatten = TRUE)
 ```
@@ -139,8 +139,7 @@ intersect %>%
            crs = 4326, agr = "constant") -> coordinates_sf
 
 st_write(coordinates_sf, 
-         "\\\\gpem-atlas2/QCPR/Projects/ABS Linkage/Data/geo/ABS/clean/BCC_traffic_locations.shp", 
-         delete_layer = TRUE)
+         here("data", "clean", "BCC_traffic_locations.shp"), delete_layer = TRUE)
 ```
 
 ```{r}
