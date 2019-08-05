@@ -6,7 +6,7 @@ library(jsonlite)
 library(readr)
 
 # messaging file
-fileConn <- file("/RDS/Q0786/data/BCC/traffic/raw/bcc_2019_04.txt", "w")
+fileConn <- file("/RDS/Q1071/TEMPO_BCC-traffic/data/raw/bcc_2019_04.txt", "w")
 
 # loop prep
 names <- list.files(pattern  =".json") #, full.names = TRUE)
@@ -63,8 +63,8 @@ rm(i)
 
 writeLines(paste(Sys.time(), "Processed"), fileConn)
 
-system("mv bcc_2019_04.csv /RDS/Q0786/data/BCC/traffic/raw/")
-system("mv bcc_2019_04_agg.csv /RDS/Q0786/data/BCC/traffic/raw/")
+system("mv bcc_2019_04.csv /RDS/Q1071/TEMPO_BCC-traffic/data/raw/")
+system("mv bcc_2019_04_agg.csv /RDS/Q1071/TEMPO_BCC-traffic/data/raw/")
 
 writeLines(paste(Sys.time(), "Finished"), fileConn)
 close(fileConn)

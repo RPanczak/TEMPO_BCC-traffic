@@ -3,10 +3,10 @@
 #PBS -l walltime=02:00:00
 
 # data
-cp /RDS/Q0786/data/BCC/traffic/raw/bcc_2019_04_agg.csv $TMPDIR
+cp /RDS/Q1071/TEMPO_BCC-traffic/data/raw/bcc_2019_04_agg.csv $TMPDIR
 
 # script
-cat /RDS/Q0786/08_4_BCC_traffic_HPC_proc_rds.R | tr -d '\r' > $TMPDIR/08_4_BCC_traffic_HPC_proc_rds.R
+cat /RDS/Q1071/TEMPO_BCC-traffic/08_4_BCC_traffic_HPC_proc_rds.R | tr -d '\r' > $TMPDIR/08_4_BCC_traffic_HPC_proc_rds.R
 
 cd $TMPDIR
 

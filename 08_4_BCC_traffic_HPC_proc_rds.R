@@ -6,7 +6,7 @@ set.seed(12345)
 library(readr)
 
 # messaging file
-fileConn <- file("/RDS/Q0786/data/BCC/traffic/clean/bcc_2019_04_agg.txt", "w")
+fileConn <- file("/RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_04_agg.txt", "w")
 writeLines(paste(Sys.time(), "Job started"), fileConn)
 
 bcc_2019_04_agg <- read_csv("bcc_2019_04_agg.csv")
@@ -28,7 +28,7 @@ bcc_2019_04_agg <- bcc_2019_04_agg[order(bcc_2019_04_agg$recorded, bcc_2019_04_a
 
 saveRDS(bcc_2019_04_agg, "bcc_2019_04_agg.Rds")
 
-system("mv bcc_2019_04_agg.Rds /RDS/Q0786/data/BCC/traffic/clean/")
+system("mv bcc_2019_04_agg.Rds /RDS/Q1071/TEMPO_BCC-traffic/data/clean/")
 
 writeLines(paste(Sys.time(), "Rds created"), fileConn)
 
@@ -36,7 +36,7 @@ writeLines(paste(Sys.time(), "Rds created"), fileConn)
 bcc_2019_04_city <- aggregate(mf ~ recorded, bcc_2019_04_agg, sum)
 saveRDS(bcc_2019_04_city, "bcc_2019_04_city.Rds")
 
-system("mv bcc_2019_04_city.Rds /RDS/Q0786/data/BCC/traffic/clean/")
+system("mv bcc_2019_04_city.Rds /RDS/Q1071/TEMPO_BCC-traffic/data/clean/")
 
 writeLines(paste(Sys.time(), "city created"), fileConn)
 
@@ -51,7 +51,7 @@ ggplot(bcc_2019_04_agg, aes(x = recorded, y = mf)) +
 
 ggsave("bcc_2019_04_agg.png", width = 32, height = 18, units = "cm", dpi = 300)
 
-system("mv bcc_2019_04_agg.png /RDS/Q0786/data/BCC/traffic/clean/")
+system("mv bcc_2019_04_agg.png /RDS/Q1071/TEMPO_BCC-traffic/data/clean/")
 
 # city curve
 ggplot(bcc_2019_04_city, aes(x = recorded, y = mf)) + 
@@ -61,7 +61,7 @@ ggplot(bcc_2019_04_city, aes(x = recorded, y = mf)) +
 
 ggsave("bcc_2019_04_city.png", width = 32, height = 18, units = "cm", dpi = 300)
 
-system("mv bcc_2019_04_city.png /RDS/Q0786/data/BCC/traffic/clean/")
+system("mv bcc_2019_04_city.png /RDS/Q1071/TEMPO_BCC-traffic/data/clean/")
 
 writeLines(paste(Sys.time(), "Finished"), fileConn)
 close(fileConn)
