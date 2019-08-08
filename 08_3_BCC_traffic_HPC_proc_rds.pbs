@@ -1,9 +1,9 @@
 #PBS -A UQ-SCI-Earth
-#PBS -l select=1:ncpus=1:mem=32GB
+#PBS -l select=1:ncpus=1:mem=48GB
 #PBS -l walltime=02:00:00
 
 # data
-cp /RDS/Q1071/TEMPO_BCC-traffic/data/raw/bcc_2019_04_agg.csv $TMPDIR
+cp /RDS/Q1071/TEMPO_BCC-traffic/data/raw/bcc_2019_07_agg.csv $TMPDIR
 
 # script
 cat /RDS/Q1071/TEMPO_BCC-traffic/08_4_BCC_traffic_HPC_proc_rds.R | tr -d '\r' > $TMPDIR/08_4_BCC_traffic_HPC_proc_rds.R

@@ -11,11 +11,13 @@ files <- list.files(pattern = "agg.Rds")
 for (i in 1:length(files)) assign(files[i], readRDS(files[i]))
 rm(files, i)
 
-BCC_raw <- rbind(back_01_agg.Rds, back_02_agg.Rds, bcc_2018_09_agg.Rds, bcc_2018_10_agg.Rds, bcc_2018_11_agg.Rds, bcc_2018_12_agg.Rds, 
-                 bcc_2019_01_agg.Rds, bcc_2019_02_agg.Rds, bcc_2019_03_agg.Rds, bcc_2019_04_agg.Rds)
+BCC_raw <- rbind(back_01_agg.Rds, back_02_agg.Rds, bcc_2018_09_agg.Rds, bcc_2018_10_agg.Rds, bcc_2018_11_agg.Rds, 
+                 bcc_2018_12_agg.Rds, bcc_2019_01_agg.Rds, bcc_2019_02_agg.Rds, bcc_2019_03_agg.Rds, bcc_2019_04_agg.Rds, 
+                 bcc_2019_05_agg.Rds, bcc_2019_06_agg.Rds, bcc_2019_07_agg.Rds)
 
-rm(back_01_agg.Rds, back_02_agg.Rds, bcc_2018_09_agg.Rds, bcc_2018_10_agg.Rds, bcc_2018_11_agg.Rds, bcc_2018_12_agg.Rds, 
-   bcc_2019_01_agg.Rds, bcc_2019_02_agg.Rds, bcc_2019_03_agg.Rds, bcc_2019_04_agg.Rds)
+rm(back_01_agg.Rds, back_02_agg.Rds, bcc_2018_09_agg.Rds, bcc_2018_10_agg.Rds, bcc_2018_11_agg.Rds, 
+   bcc_2018_12_agg.Rds, bcc_2019_01_agg.Rds, bcc_2019_02_agg.Rds, bcc_2019_03_agg.Rds, bcc_2019_04_agg.Rds, 
+   bcc_2019_05_agg.Rds, bcc_2019_06_agg.Rds, bcc_2019_07_agg.Rds)
 
 
 # duplicates

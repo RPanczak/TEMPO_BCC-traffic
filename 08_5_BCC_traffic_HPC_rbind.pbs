@@ -1,6 +1,6 @@
 #PBS -A UQ-SCI-Earth
-#PBS -l select=1:ncpus=1:mem=96GB
-#PBS -l walltime=01:00:00
+#PBS -l select=1:ncpus=1:mem=144GB
+#PBS -l walltime=02:00:00
 
 # data
 cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/back_01_agg.Rds $TMPDIR
@@ -13,6 +13,9 @@ cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_01_agg.Rds $TMPDIR
 cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_02_agg.Rds $TMPDIR
 cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_03_agg.Rds $TMPDIR
 cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_04_agg.Rds $TMPDIR
+cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_05_agg.Rds $TMPDIR
+cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_06_agg.Rds $TMPDIR
+cp /RDS/Q1071/TEMPO_BCC-traffic/data/clean/bcc_2019_07_agg.Rds $TMPDIR
 
 # script
 cat /RDS/Q1071/TEMPO_BCC-traffic/08_6_BCC_traffic_HPC_rbind.R | tr -d '\r' > $TMPDIR/08_6_BCC_traffic_HPC_rbind.R

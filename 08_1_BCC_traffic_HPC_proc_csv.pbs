@@ -3,12 +3,13 @@
 #PBS -l walltime=02:00:00
 
 # data
-tar -zxf /RDS/Q1071/TEMPO_BCC-traffic/data/raw/2019-04.tar.gz -C $TMPDIR
+tar -zxf /RDS/Q1071/TEMPO_BCC-traffic/data/raw/2019-07.tar.gz -C $TMPDIR
 
 # script
-cat /RDS/Q1071/TEMPO_BCC-traffic/08_2_BCC_traffic_HPC_proc_csv.R | tr -d '\r' > $TMPDIR/2019-04/08_2_BCC_traffic_HPC_proc_csv.R
+cat /RDS/Q1071/TEMPO_BCC-traffic/08_2_BCC_traffic_HPC_proc_csv.R | tr -d '\r' > $TMPDIR/2019-07/08_2_BCC_traffic_HPC_proc_csv.R
 
-cd $TMPDIR/2019-04
+cd $TMPDIR/2019-07
+find . -name "*.json" -size -17k -delete
 
 module purge
 module load R
