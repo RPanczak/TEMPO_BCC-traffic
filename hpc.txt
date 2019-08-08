@@ -1,0 +1,89 @@
+# #####################################
+# sequential proc of BCC monthly data
+
+# 1
+cat -v /RDS/Q1071/TEMPO_BCC-traffic/08_2_BCC_traffic_HPC_proc_csv.R
+
+cat /RDS/Q1071/TEMPO_BCC-traffic/08_1_BCC_traffic_HPC_proc_csv.pbs | tr -d '\r' > /home/uqrpancz/08_1_BCC_traffic_HPC_proc_csv.pbs
+cat -v /home/uqrpancz/08_1_BCC_traffic_HPC_proc_csv.pbs
+
+qsub /home/uqrpancz/08_1_BCC_traffic_HPC_proc_csv.pbs
+
+# 2
+cat -v /RDS/Q1071/TEMPO_BCC-traffic/08_4_BCC_traffic_HPC_proc_rds.R
+
+cat /RDS/Q1071/TEMPO_BCC-traffic/08_3_BCC_traffic_HPC_proc_rds.pbs | tr -d '\r' > /home/uqrpancz/08_3_BCC_traffic_HPC_proc_rds.pbs
+cat -v /home/uqrpancz/08_3_BCC_traffic_HPC_proc_rds.pbs
+
+qsub /home/uqrpancz/08_3_BCC_traffic_HPC_proc_rds.pbs
+
+# 3
+cat -v /RDS/Q1071/TEMPO_BCC-traffic/08_6_BCC_traffic_HPC_rbind.R
+
+cat /RDS/Q1071/TEMPO_BCC-traffic/08_5_BCC_traffic_HPC_rbind.pbs | tr -d '\r' > /home/uqrpancz/08_5_BCC_traffic_HPC_rbind.pbs
+cat -v /home/uqrpancz/08_5_BCC_traffic_HPC_rbind.pbs
+
+qsub /home/uqrpancz/08_5_BCC_traffic_HPC_rbind.pbs
+
+# 4
+cat -v /RDS/Q1071/TEMPO_BCC-traffic/08_8_BCC_traffic_HPC_8074.R
+
+cat /RDS/Q1071/TEMPO_BCC-traffic/08_7_BCC_traffic_HPC_8074.pbs | tr -d '\r' > /home/uqrpancz/08_7_BCC_traffic_HPC_8074.pbs
+cat -v /home/uqrpancz/08_7_BCC_traffic_HPC_8074.pbs
+
+qsub /home/uqrpancz/08_7_BCC_traffic_HPC_8074.pbs
+
+qstat -aw1nt
+
+# #####################################
+# file sizes
+ls -l --block-size=K
+
+find . -name "*.json" -size -17k
+
+find . -name "*.json" -size -17k -delete
+
+# #####################################
+# de<>compressing files
+
+cd /RDS/Q1071/TEMPO_BCC-traffic/data/raw/
+
+tar -zxvf 2019-07.tar.gz
+
+# compress 
+
+cd /RDS/Q1071/TEMPO_BCC-traffic/data/raw/
+
+tar -zcvf 2019-06.tar.gz 2019-06
+
+# count number of files in archive
+tar -tzf /RDS/Q1071/TEMPO_BCC-traffic/data/raw/2019-06.tar.gz | wc -l
+tar -tzf 2019-06.tar.gz | wc -l
+
+# count number of files in directory
+cd 2019-06
+ls -l . | egrep -c '^-'
+
+cd .. 
+rm -r 2019-06
+
+# #####################################
+# packing large CSVs
+
+cd /RDS/Q1071/TEMPO_BCC-traffic/data/raw/
+
+tar -zcvf bcc_2019_07.csv.tar.gz bcc_2019_07.csv
+rm bcc_2019_07.csv
+
+tar -zcvf bcc_2019_07_agg.csv.tar.gz bcc_2019_07_agg.csv
+rm bcc_2019_07_agg.csv
+
+cp -v /RDS/Q1071/TEMPO_BCC-traffic/data/raw/bcc_2019_07.csv.tar.gz $TMPDIR
+cd $TMPDIR
+tar -xzvf bcc_2019_07.csv.tar.gz
+
+# #####################################
+# mv *.json R:/BCCTRAFFIC-Q1071/TEMPO_BCC-traffic/data/raw/2019-05
+# mv *.json /r/BCCTRAFFIC-Q1071/TEMPO_BCC-traffic/data/raw/2019-05
+
+find . -name \*.json.gz -not -path \*/\.\* | wc -l
