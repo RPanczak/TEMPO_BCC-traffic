@@ -1,5 +1,5 @@
 #PBS -A UQ-SCI-Earth
-#PBS -l select=1:ncpus=1:mem=144GB
+#PBS -l select=1:ncpus=1:mem=248GB
 #PBS -l walltime=02:00:00
 
 # data
