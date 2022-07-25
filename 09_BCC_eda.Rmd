@@ -12,6 +12,8 @@ output:
     number_sections: true
     theme: united 
     highlight: pygments 
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- ------------------------------------------------------------ --> 
@@ -19,9 +21,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = TRUE, fig.width=8, fig.height=6, dpi=300, out.width="800px", out.height="600px")
-
-# knitr::opts_knit$set(root.dir = 'R:/POP247-Q0786/')
-# setwd('R:/POP247-Q0786/')
 
 set.seed(12345)
 
@@ -37,11 +36,10 @@ tmap_mode("view") # makes map interactive
 isUnique <- function(vector){
   return(!any(duplicated(vector)))
 }
-
 ```
 
 ```{r}
-BCC_raw <- readRDS(here("data", "BCC", "traffic", "clean", "BCC_raw.Rds"))
+BCC_raw <- readRDS(here("data", "clean", "bcc_2018_09_agg.Rds"))
 ```
 
 ```{r}
@@ -55,9 +53,8 @@ ggplot(traffic_8074, aes(x = recorded, y = mf)) +
   xlab("") + ylab("Measured flow (all lanes)")
 ```
 
-
 ```{r}
-mf_8074 %>% 
+traffic_8074 %>% 
   # slice(1:10) %>% 
   select(recorded) %>% 
   mutate(date = as.Date(recorded)) %>% 
@@ -68,7 +65,7 @@ mf_8074 %>%
 ```
 
 ```{r eval=FALSE, include=FALSE}
-temp <- mf_8074 %>% 
+temp <- traffic_8074 %>% 
   # slice(1:10) %>%
   select(recorded) %>% 
   mutate(date = as.Date(recorded)) %>% 
@@ -84,6 +81,5 @@ traffic_8074 <- read_csv(here("data", "BCC", "traffic", "raw", "back_02.csv")) %
   filter(tsc == 8074) 
 
 freq(traffic_8074$lane)
-
 ```
 
